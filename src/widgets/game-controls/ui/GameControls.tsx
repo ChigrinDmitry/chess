@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Color } from '@/entities/game'
 import { FlipBoardButton } from '@/features/flip-board'
-import { DrawOfferDialog, OfferDrawButton, useDrawOffer } from '@/features/offer-draw'
+import { DrawOfferDialog, OfferDrawButton } from '@/features/offer-draw'
 import { ResignButton } from '@/features/resign-game'
 import { GlassButton, GlassModal } from '@/shared/ui'
 import styles from './GameControls.module.css'
@@ -11,11 +11,14 @@ export interface GameControlsProps {
   actor: Color
   /** Партия идёт: можно сдаться и предложить ничью. */
   inProgress: boolean
-  /** Сыграно полуходов: предложение ничьей действует до следующего хода. */
+  /** Сыграно полуходов: новая партия посреди игры просит подтверждения. */
   plyCount: number
+  /** Кто предложил ничью и ждёт ответа от нас; `null` — отвечать не на что. */
+  drawOfferedBy: Color | null
   onFlip: () => void
   onResign: (color: Color) => void
-  onAgreeDraw: () => void
+  onOfferDraw: () => void
+  onAnswerDraw: (accept: boolean) => void
   onNewGame: () => void
 }
 
@@ -24,18 +27,14 @@ export function GameControls({
   actor,
   inProgress,
   plyCount,
+  drawOfferedBy,
   onFlip,
   onResign,
-  onAgreeDraw,
+  onOfferDraw,
+  onAnswerDraw,
   onNewGame,
 }: GameControlsProps) {
-  const drawOffer = useDrawOffer(plyCount)
   const [confirmingNew, setConfirmingNew] = useState(false)
-
-  const acceptDraw = () => {
-    drawOffer.clear()
-    onAgreeDraw()
-  }
 
   const startNew = () => {
     // Идущую партию теряем только после подтверждения
@@ -45,7 +44,6 @@ export function GameControls({
 
   const confirmNew = () => {
     setConfirmingNew(false)
-    drawOffer.clear()
     onNewGame()
   }
 
@@ -53,7 +51,7 @@ export function GameControls({
     <div className={styles.controls}>
       {inProgress && (
         <>
-          <OfferDrawButton onOffer={() => drawOffer.offer(actor)} />
+          <OfferDrawButton onOffer={onOfferDraw} />
           <ResignButton color={actor} onResign={onResign} />
         </>
       )}
@@ -63,9 +61,9 @@ export function GameControls({
       </GlassButton>
 
       <DrawOfferDialog
-        offeredBy={inProgress ? drawOffer.offeredBy : null}
-        onAccept={acceptDraw}
-        onDecline={drawOffer.clear}
+        offeredBy={inProgress ? drawOfferedBy : null}
+        onAccept={() => onAnswerDraw(true)}
+        onDecline={() => onAnswerDraw(false)}
       />
       <GlassModal
         open={confirmingNew}

@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { StrictMode } from 'react'
 import { MemoryRouter } from 'react-router'
 import { LocalGamePage } from '../index'
 
@@ -110,6 +111,20 @@ describe('LocalGamePage', () => {
     move('g7', 'h8')
     await userEvent.click(screen.getByRole('button', { name: 'белый ферзь' }))
     expect(cell('h8')).toHaveAccessibleName('h8, белый ферзь')
+  })
+
+  it('переживает двойной запуск эффектов StrictMode', () => {
+    render(
+      <StrictMode>
+        <MemoryRouter>
+          <LocalGamePage />
+        </MemoryRouter>
+      </StrictMode>,
+    )
+    move('e2', 'e4')
+    move('e7', 'e5')
+    expect(cell('e5')).toHaveAccessibleName('e5, чёрная пешка')
+    expect(screen.getByText('Ход белых')).toBeInTheDocument()
   })
 
   describe('история', () => {

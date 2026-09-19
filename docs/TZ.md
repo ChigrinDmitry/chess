@@ -123,10 +123,13 @@ interface GameTransport {
 
 Протокол (Zod-схемы в `shared/api`):
 
-- Клиент → сервер: `join`, `move {from,to,promotion}`, `resign`, `offerDraw`, `answerDraw`, `rematch`, `takeback` (бот), `ping`.
-- Сервер → клиент: `state {fen, moves, clocks, status, players}`, `moved`, `drawOffered`, `gameOver {result, reason}`, `opponentPresence`, `error`.
+- Клиент → сервер: `join {identity, color?}` (повторный `join` — resync), `move {from,to,promotion}`, `resign`, `offerDraw`, `answerDraw {accept}`, `rematch`, `takeback` (бот), `ping`.
+- Сервер → клиент: `state {status, startFen, fen, moves, clock, result, players, you, drawOffer}` (персональное: `you` — цвета получателя, в hot-seat оба), `moved {ply, san, move, fen, clock}`, `drawOffered {by}`, `drawDeclined`, `rematchRequested {by}`, `gameOver {result, reason, clock}`, `opponentPresence {color, online}`, `error {code}`.
+- Сообщения хоста и клиента ходят через две стороны транспорта: `GameTransport` (клиент, как выше) и `HostTransport` (`onMessage(clientId, msg)`, `send`, `broadcast`, `onClientDisconnect`) — её слушает `host-game`. `clientId` выдаёт транспорт, он уникален для каждого соединения.
 
-**Принцип:** хост авторитетен. Клиент делает оптимистичный ход, итоговое состояние приходит из `state/moved`; при расхождении — откат.
+**Принцип:** хост авторитетен. Клиент делает оптимистичный ход, итоговое состояние приходит из `state/moved`; при расхождении — откат (клиент запрашивает `state` повторным `join`).
+
+**hot-seat** — тот же путь: за экраном один клиент, а хост создан с `hotSeat` — места заняты сразу, а от имени нужной стороны (чей ход; кто отвечает на ничью) выступает любой клиент.
 
 ### 5.2 Сессия и личность (задел под авторизацию)
 
