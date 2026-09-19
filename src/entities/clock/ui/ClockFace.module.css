@@ -1,0 +1,26 @@
+.clock {
+  display: inline-block;
+  min-width: 4.5ch;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.running {
+  color: var(--text);
+  background: var(--glass-fill-strong);
+}
+
+.low {
+  color: var(--danger-text);
+}
