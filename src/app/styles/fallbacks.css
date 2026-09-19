@@ -1,0 +1,52 @@
+/*
+ * Деградация стекла и анимаций. Подключается после themes.css: селекторы
+ * `:root:root` и `[data-glass]` имеют ту же специфичность, что и темы, и выигрывают порядком.
+ * Атрибут data-glass="solid" — ручное включение «упрощённого стекла» (этап 9, витрина /kit).
+ */
+
+/* Браузер не умеет backdrop-filter → плотная заливка без размытия */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:root {
+    --glass-blur: 0px;
+    --glass-blur-strong: 0px;
+    --glass-fill: var(--glass-fill-solid);
+    --glass-fill-strong: var(--glass-fill-strong-solid);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root:root {
+    --glass-blur: 0px;
+    --glass-blur-strong: 0px;
+    --glass-fill: var(--glass-fill-solid);
+    --glass-fill-strong: var(--glass-fill-strong-solid);
+    --blob-opacity: 0.5;
+  }
+}
+
+:root[data-glass='solid'] {
+  --glass-blur: 0px;
+  --glass-blur-strong: 0px;
+  --glass-fill: var(--glass-fill-solid);
+  --glass-fill-strong: var(--glass-fill-strong-solid);
+}
+
+/* Повышенная контрастность: непрозрачнее заливка, заметнее границы */
+@media (prefers-contrast: more) {
+  :root:root {
+    --glass-fill: var(--glass-fill-solid);
+    --glass-fill-strong: var(--glass-fill-strong-solid);
+    --glass-border: currentcolor;
+    --text-muted: var(--text);
+  }
+}
+
+/* Без анимаций: фон статичен, пружины и переходы мгновенные */
+@media (prefers-reduced-motion: reduce) {
+  :root:root {
+    --dur-fast: 0.01ms;
+    --dur-base: 0.01ms;
+    --dur-slow: 0.01ms;
+    --ease-spring: linear;
+  }
+}

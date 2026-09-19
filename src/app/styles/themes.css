@@ -1,0 +1,89 @@
+/*
+ * Цветовые токены тем. Тема выбирается атрибутом :root[data-theme] — его ставит
+ * инлайн-скрипт в index.html до первого рендера. Светлая тема — значения по умолчанию.
+ */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Фон */
+  --bg-base: #e9eefb;
+  --blob-1: #7aa2ff;
+  --blob-2: #ff8fb8;
+  --blob-3: #7be3d0;
+  --blob-4: #ffc27a;
+  --blob-opacity: 0.85;
+
+  /* Стекло */
+  --glass-fill: rgb(255 255 255 / 0.42);
+  --glass-fill-strong: rgb(255 255 255 / 0.64);
+  --glass-fill-solid: rgb(247 249 254 / 0.97);
+  --glass-fill-strong-solid: rgb(255 255 255 / 1);
+  --glass-border: rgb(255 255 255 / 0.75);
+  --glass-highlight: rgb(255 255 255 / 0.95);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.55) 0%, rgb(255 255 255 / 0) 42%);
+  --glass-shadow: 0 8px 32px rgb(31 45 95 / 0.14), 0 1px 2px rgb(31 45 95 / 0.1);
+  --scrim: rgb(20 28 60 / 0.32);
+
+  /* Текст */
+  --text: #12172a;
+  --text-muted: #46506a;
+  --text-on-accent: #ffffff;
+
+  /* Акценты */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --danger: #c62839;
+  --danger-text: #a81f2e;
+  --danger-hover: #a81f2e;
+  --focus-ring: #4338ca;
+
+  /* Доска */
+  --board-light: rgb(255 255 255 / 0.58);
+  --board-dark: rgb(63 80 150 / 0.55);
+  --board-coord: #2c3557;
+  --hl-select: #6b5cff;
+  --hl-move: #178a5c;
+  --hl-last: #e0a020;
+  --hl-check: #e5384f;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-base: #0b1020;
+  --blob-1: #3b5bdb;
+  --blob-2: #b0357a;
+  --blob-3: #128a7d;
+  --blob-4: #b8641f;
+  --blob-opacity: 0.7;
+
+  --glass-fill: rgb(22 28 52 / 0.5);
+  --glass-fill-strong: rgb(46 55 96 / 0.62);
+  --glass-fill-solid: rgb(24 30 54 / 0.97);
+  --glass-fill-strong-solid: rgb(42 51 88 / 1);
+  --glass-border: rgb(255 255 255 / 0.16);
+  --glass-highlight: rgb(255 255 255 / 0.24);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0) 40%);
+  --glass-shadow: 0 10px 40px rgb(0 0 0 / 0.45), 0 1px 2px rgb(0 0 0 / 0.4);
+  --scrim: rgb(2 4 14 / 0.55);
+
+  --text: #eef1fb;
+  --text-muted: #a9b2cc;
+  --text-on-accent: #0c1030;
+
+  --accent: #8c8bff;
+  --accent-hover: #a3a2ff;
+  --danger: #ff6b7d;
+  --danger-text: #ff6b7d;
+  --danger-hover: #ff8896;
+  --focus-ring: #b3b8ff;
+
+  --board-light: rgb(255 255 255 / 0.3);
+  --board-dark: rgb(8 12 30 / 0.4);
+  --board-coord: #c9d0ea;
+  --hl-select: #9d92ff;
+  --hl-move: #3ecf8e;
+  --hl-last: #f5c04a;
+  --hl-check: #ff5470;
+}

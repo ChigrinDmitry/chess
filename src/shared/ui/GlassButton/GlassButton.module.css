@@ -1,0 +1,91 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    background-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.03);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.95);
+  transition-duration: var(--dur-fast);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Размеры: минимальная высота 44px у lg и md — цель касания на мобильных */
+.sm {
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.md {
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  font-size: var(--text-md);
+}
+
+.lg {
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  font-size: var(--text-lg);
+}
+
+/* secondary получает стеклянную поверхность из glass.module.css */
+.secondary {
+  color: var(--text);
+}
+
+.ghost {
+  color: var(--text);
+  background: transparent;
+  border: var(--border-width) solid transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--glass-fill);
+}
+
+.primary,
+.danger {
+  border: var(--border-width) solid var(--glass-border);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.primary {
+  color: var(--text-on-accent);
+  background: var(--accent);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.danger {
+  color: var(--text-on-accent);
+  background: var(--danger);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--danger-hover);
+}

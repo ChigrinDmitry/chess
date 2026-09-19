@@ -1,0 +1,74 @@
+.control {
+  --pad: 4px;
+  display: inline-grid;
+  grid-auto-flow: column;
+  padding: var(--pad);
+  border-radius: var(--radius-pill);
+}
+
+/* Ползунок: позицию и ширину выставляет компонент (--thumb-x/--thumb-w), движение пружиной */
+.thumb {
+  position: absolute;
+  top: var(--pad);
+  bottom: var(--pad);
+  width: var(--thumb-w, 0);
+  left: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35);
+  transform: translateX(var(--thumb-x, 0));
+  pointer-events: none;
+}
+
+.control[data-ready] .thumb {
+  transition:
+    transform var(--dur-slow) var(--ease-spring),
+    width var(--dur-slow) var(--ease-spring);
+}
+
+.option {
+  position: relative;
+  display: grid;
+  min-height: 36px;
+  place-items: center;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option:hover {
+  color: var(--text);
+}
+
+.option:has(:checked) {
+  color: var(--text-on-accent);
+}
+
+.option:has(:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Скрытый, но фокусируемый radio; кольцо фокуса рисуем на подписи */
+.input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.option:has(:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.text {
+  position: relative;
+}
