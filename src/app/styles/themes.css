@@ -46,6 +46,16 @@
   --hl-move: #178a5c;
   --hl-last: #e0a020;
   --hl-check: #e5384f;
+
+  /* Фигуры: градиент сверху вниз, обводка, внутренний блик */
+  --piece-w-top: #ffffff;
+  --piece-w-bottom: #c9d3f2;
+  --piece-w-stroke: #26305a;
+  --piece-b-top: #5a6597;
+  --piece-b-bottom: #1a2046;
+  --piece-b-stroke: #0d1230;
+  --piece-sheen: rgb(255 255 255 / 0.6);
+  --piece-shadow: rgb(20 28 70 / 0.35);
 }
 
 :root[data-theme='dark'] {
@@ -86,4 +96,13 @@
   --hl-move: #3ecf8e;
   --hl-last: #f5c04a;
   --hl-check: #ff5470;
+
+  --piece-w-top: #ffffff;
+  --piece-w-bottom: #b4c0ea;
+  --piece-w-stroke: #0b1030;
+  --piece-b-top: #4a5590;
+  --piece-b-bottom: #131838;
+  --piece-b-stroke: #c9d0f5;
+  --piece-sheen: rgb(255 255 255 / 0.45);
+  --piece-shadow: rgb(0 0 0 / 0.55);
 }
