@@ -17,9 +17,11 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "chess.js": "^1.4.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router": "^8.4.0"
+    "react-router": "^8.4.0",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@feature-sliced/steiger-plugin": "^0.7.0",

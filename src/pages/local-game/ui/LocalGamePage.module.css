@@ -1,0 +1,21 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 100dvh;
+  padding: var(--space-4);
+}
+
+.status {
+  padding: var(--space-2) var(--space-5);
+  text-align: center;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}

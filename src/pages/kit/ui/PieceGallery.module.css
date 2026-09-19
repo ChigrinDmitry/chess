@@ -1,0 +1,31 @@
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  max-width: 480px;
+}
+
+.cell {
+  aspect-ratio: 1;
+  padding: 6%;
+}
+
+.light {
+  background: var(--board-light);
+}
+
+.dark {
+  background: var(--board-dark);
+}
+
+.small {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.small > * {
+  width: 32px;
+  height: 32px;
+}

@@ -10,6 +10,7 @@ import {
   type SegmentedOption,
 } from '@/shared/ui'
 import { BoardSample } from './BoardSample'
+import { PieceGallery } from './PieceGallery'
 import styles from './KitPage.module.css'
 
 type GlassMode = 'glass' | 'solid'
@@ -144,6 +145,10 @@ export function KitPage() {
 
         <Section title="Палитра доски">
           <BoardSample />
+        </Section>
+
+        <Section title="Фигуры">
+          <PieceGallery />
         </Section>
       </div>
 
