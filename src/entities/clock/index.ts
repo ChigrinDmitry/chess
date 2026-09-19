@@ -19,3 +19,7 @@ export type {
 } from './model/store'
 export { getTimeControl, TIME_CONTROLS } from './model/timeControls'
 export type { TimeControl, TimeControlId } from './model/timeControls'
+export { LOW_TIME_MS, formatClock } from './model/format'
+export { useClockRemaining } from './model/useClockRemaining'
+export { watchFlag } from './model/watchFlag'
+export { ClockFace, type ClockFaceProps } from './ui/ClockFace'

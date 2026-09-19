@@ -1,0 +1,78 @@
+.sidebar {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  min-height: 0;
+  width: 100%;
+}
+
+.moves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.status {
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 96px;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+/* Узкий экран: панели игроков в один ряд над списком ходов, доска остаётся выше */
+@media (max-width: 899px) {
+  .sidebar {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .top {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .bottom {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .moves {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .scroll {
+    max-height: 168px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .top,
+  .bottom,
+  .moves {
+    grid-column: 1;
+  }
+
+  .top {
+    grid-row: 1;
+  }
+
+  .bottom {
+    grid-row: 2;
+  }
+
+  .moves {
+    grid-row: 3;
+  }
+}

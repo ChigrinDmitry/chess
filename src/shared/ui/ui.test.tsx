@@ -1,7 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { GlassAvatar, GlassButton, GlassInput, GlassModal, GlassSegmentedControl } from './index'
+import { MemoryRouter } from 'react-router'
+import {
+  GlassAvatar,
+  GlassButton,
+  GlassInput,
+  GlassLink,
+  GlassModal,
+  GlassSegmentedControl,
+} from './index'
 import { getAvatarHues, getInitials } from './GlassAvatar/avatar-color'
 
 describe('GlassButton', () => {
@@ -122,5 +130,20 @@ describe('GlassModal', () => {
     render(<Harness onClose={onClose} />)
     await userEvent.click(screen.getByRole('button', { name: 'Закрыть' }))
     expect(onClose).toHaveBeenCalled()
+  })
+})
+
+describe('GlassLink', () => {
+  it('is a real link styled as a button', () => {
+    render(
+      <MemoryRouter>
+        <GlassLink to="/local" variant="primary">
+          Играть
+        </GlassLink>
+      </MemoryRouter>,
+    )
+    const link = screen.getByRole('link', { name: 'Играть' })
+    expect(link).toHaveAttribute('href', '/local')
+    expect(link).toHaveClass('button', 'primary')
   })
 })

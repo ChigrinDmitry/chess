@@ -1,6 +1,6 @@
-import { countMaterial } from './fen'
+import { countMaterial, piecesFromFen } from './fen'
 import type { GameState } from './store'
-import type { Color, MoveRecord, PieceType, Square } from './types'
+import type { Color, MoveRecord, PieceType, PlacedPiece, Square } from './types'
 
 export const selectIsGameOver = (s: GameState): boolean => s.result !== null
 
@@ -43,4 +43,30 @@ export const selectMaterialBalance = (s: GameState): number =>
 export const selectFenAt = (s: GameState, ply: number): string | undefined => {
   if (ply === 0) return s.startFen
   return s.moves[ply - 1]?.fen
+}
+
+/** Позиция после `ply` полуходов — то, что показывает доска при просмотре истории. */
+export interface PositionView {
+  fen: string
+  turn: Color
+  pieces: PlacedPiece[]
+  lastMove: MoveRecord | undefined
+  checkedSquare: Square | null
+}
+
+/**
+ * Позиция для показа на доске после `ply` полуходов (0 — начальная; значение зажимается в
+ * допустимые границы). Шах определяется по SAN хода (`+`/`#`), поэтому правила не нужны.
+ */
+export const selectPositionAt = (s: GameState, ply: number): PositionView => {
+  const at = Math.min(Math.max(ply, 0), s.moves.length)
+  const fen = selectFenAt(s, at) ?? s.startFen
+  const pieces = piecesFromFen(fen)
+  const turn: Color = fen.split(' ')[1] === 'b' ? 'b' : 'w'
+  const lastMove = at > 0 ? s.moves[at - 1] : undefined
+  const inCheck = lastMove ? /[+#]$/.test(lastMove.san) : at === s.moves.length && s.inCheck
+  const checkedSquare = inCheck
+    ? (pieces.find((p) => p.type === 'k' && p.color === turn)?.square ?? null)
+    : null
+  return { fen, turn, pieces, lastMove, checkedSquare }
 }

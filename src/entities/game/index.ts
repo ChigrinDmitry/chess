@@ -1,6 +1,7 @@
 export { START_FEN, piecesFromFen } from './model/fen'
 export { canDeliverMate } from './model/insufficient'
 export { createChessJsRules } from './model/rules'
+export { describeOutcome, describeReason, describeStatus } from './model/resultText'
 export {
   selectCaptured,
   selectCheckedKingSquare,
@@ -10,8 +11,10 @@ export {
   selectLastMove,
   selectLegalMovesFrom,
   selectMaterialBalance,
+  selectPositionAt,
   selectWinner,
 } from './model/selectors'
+export type { PositionView } from './model/selectors'
 export { createGameStore } from './model/store'
 export type {
   CreateGameStoreOptions,

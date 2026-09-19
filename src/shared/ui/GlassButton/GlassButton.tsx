@@ -1,6 +1,5 @@
 import type { ComponentProps } from 'react'
-import glass from '../glass.module.css'
-import styles from './GlassButton.module.css'
+import { glassButtonClasses } from './glassButtonClasses'
 
 export type GlassButtonProps = ComponentProps<'button'> & {
   variant?: 'secondary' | 'primary' | 'danger' | 'ghost'
@@ -14,16 +13,5 @@ export function GlassButton({
   className,
   ...rest
 }: GlassButtonProps) {
-  const classes = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    variant === 'secondary' && glass.surface,
-    variant === 'secondary' && glass.strong,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  return <button type={type} className={classes} {...rest} />
+  return <button type={type} className={glassButtonClasses(variant, size, className)} {...rest} />
 }

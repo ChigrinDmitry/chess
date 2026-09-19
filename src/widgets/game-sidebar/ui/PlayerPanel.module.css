@@ -1,0 +1,52 @@
+.panel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  transition:
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+/* Чей ход — подсвечивается акцентом, а не только цветом текста */
+.active {
+  border-color: var(--accent);
+  box-shadow:
+    var(--glass-shadow),
+    0 0 0 2px var(--accent);
+}
+
+.info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captured {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 18px;
+}
+
+.miniature {
+  width: 18px;
+  height: 18px;
+  margin-right: -6px;
+}
+
+.advantage {
+  margin-left: var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}

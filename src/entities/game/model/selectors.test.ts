@@ -7,6 +7,7 @@ import {
   selectLastMove,
   selectLegalMovesFrom,
   selectMaterialBalance,
+  selectPositionAt,
   selectWinner,
 } from './selectors'
 import { START_FEN } from './fen'
@@ -117,5 +118,52 @@ describe('селекторы', () => {
     expect(selectFenAt(state, 1)).toBe(state.moves[0]?.fen)
     expect(selectFenAt(state, 2)).toBe(state.fen)
     expect(selectFenAt(state, 3)).toBeUndefined()
+  })
+
+  describe('selectPositionAt', () => {
+    it('начальная позиция: без последнего хода и шаха', () => {
+      const game = gameFrom()
+      play(game, 'e2e4 e7e5')
+      const view = selectPositionAt(game.getState(), 0)
+
+      expect(view.fen).toBe(START_FEN)
+      expect(view.turn).toBe('w')
+      expect(view.pieces).toHaveLength(32)
+      expect(view.lastMove).toBeUndefined()
+      expect(view.checkedSquare).toBeNull()
+    })
+
+    it('промежуточная позиция: ход, очередь и фигуры того момента', () => {
+      const game = gameFrom()
+      play(game, 'e2e4 e7e5')
+      const view = selectPositionAt(game.getState(), 1)
+
+      expect(view.turn).toBe('b')
+      expect(view.lastMove?.san).toBe('e4')
+      expect(view.pieces.find((p) => p.square === 'e4')?.type).toBe('p')
+      expect(view.pieces.some((p) => p.square === 'e5')).toBe(false)
+    })
+
+    it('шах в прошлой позиции виден, а в нынешней уже нет', () => {
+      const game = gameFrom()
+      play(game, 'e2e4 f7f6 d1h5 g7g6 h5g6')
+      const state = game.getState()
+      expect(selectPositionAt(state, 5).checkedSquare).toBe('e8')
+
+      play(game, 'h7g6')
+      expect(selectPositionAt(game.getState(), 5).checkedSquare).toBe('e8')
+      expect(selectPositionAt(game.getState(), 6).checkedSquare).toBeNull()
+    })
+
+    it('в текущей позиции совпадает с состоянием стора и зажимает ply', () => {
+      const game = gameFrom()
+      play(game, 'f2f3 e7e5 g2g4 d8h4')
+      const state = game.getState()
+      const view = selectPositionAt(state, 99)
+
+      expect(view.fen).toBe(state.fen)
+      expect(view.checkedSquare).toBe('e1')
+      expect(selectPositionAt(state, -3).fen).toBe(START_FEN)
+    })
   })
 })
