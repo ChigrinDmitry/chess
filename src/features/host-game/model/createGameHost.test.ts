@@ -195,7 +195,7 @@ describe('вход в комнату', () => {
     expect(anna.received).toEqual([])
   })
 
-  it('отмена хода пока не поддерживается', () => {
+  it('отмена хода против человека не поддерживается', () => {
     const [anna] = twoPlayers()
     anna.send({ type: 'takeback' })
     expect(anna.last('error').code).toBe('unsupported')
@@ -633,6 +633,134 @@ describe('hot-seat', () => {
     player.move('e2', 'e4')
     vi.advanceTimersByTime(61_000)
     expect(player.last('gameOver')).toMatchObject({ result: '1-0', reason: 'timeout' })
+  })
+})
+
+describe('отмена хода (против бота)', () => {
+  const BOT: PlayerIdentity = { ...identity('bot', 'Бот'), kind: 'bot' }
+
+  /** Анна против бота: она сидит за `color`, бот — за другим цветом. */
+  function againstBot(color: Color = 'w', clock: ClockConfig | null = null) {
+    setup({ clock })
+    const bot = connect(room).join(BOT, color === 'w' ? 'b' : 'w')
+    const anna = connect(room).join(ANNA, color)
+    anna.clear()
+    return { anna, bot }
+  }
+
+  it('когда ход у игрока, снимает его ход и ответ бота', () => {
+    const { anna, bot } = againstBot()
+    anna.move('e2', 'e4')
+    bot.move('e7', 'e5')
+    anna.move('g1', 'f3')
+    bot.move('b8', 'c6')
+    anna.clear()
+    bot.clear()
+
+    anna.send({ type: 'takeback' })
+    expect(anna.last('state')).toMatchObject({ moves: ['e4', 'e5'], you: ['w'], status: 'playing' })
+    // Бот узнаёт об откате тем же состоянием
+    expect(bot.last('state').moves).toEqual(['e4', 'e5'])
+
+    anna.move('d2', 'd4')
+    expect(anna.last('moved').ply).toBe(3)
+  })
+
+  it('пока бот думает, снимает только ход игрока', () => {
+    const { anna, bot } = againstBot()
+    anna.move('e2', 'e4')
+    bot.move('e7', 'e5')
+    anna.move('g1', 'f3')
+
+    anna.send({ type: 'takeback' })
+    expect(anna.last('state').moves).toEqual(['e4', 'e5'])
+    bot.move('b8', 'c6')
+    expect(bot.last('error').code).toBe('not-your-turn')
+  })
+
+  it('играя чёрными, отменяет только свой ход и ответ бота', () => {
+    const { anna, bot } = againstBot('b')
+    bot.move('e2', 'e4')
+    anna.move('e7', 'e5')
+    bot.move('g1', 'f3')
+
+    anna.send({ type: 'takeback' })
+    expect(anna.last('state')).toMatchObject({ moves: ['e4'], you: ['b'] })
+  })
+
+  it('без ходов игрока отменять нечего', () => {
+    const { anna, bot } = againstBot('b')
+    anna.send({ type: 'takeback' })
+    expect(anna.last('error').code).toBe('takeback-unavailable')
+
+    bot.move('e2', 'e4')
+    anna.send({ type: 'takeback' })
+    expect(anna.last('error').code).toBe('takeback-unavailable')
+    expect(host.snapshot('local-1').moves).toEqual(['e4'])
+  })
+
+  it('снимает предложение ничьей', () => {
+    const { anna, bot } = againstBot()
+    anna.move('e2', 'e4')
+    bot.move('e7', 'e5')
+    anna.send({ type: 'offerDraw' })
+    anna.send({ type: 'takeback' })
+    expect(anna.last('state').drawOffer).toBeNull()
+  })
+
+  it('после окончания партии и в hot-seat не работает', () => {
+    const { anna } = againstBot()
+    anna.move('e2', 'e4')
+    anna.send({ type: 'resign' })
+    anna.send({ type: 'takeback' })
+    expect(anna.last('error').code).toBe('game-over')
+
+    host.stop()
+    room = createLocalRoom()
+    host = createGameHost({
+      transport: room.host,
+      clock: null,
+      hotSeat: { w: ANNA, b: BOT },
+    })
+    host.start()
+    const player = connect(room).join(ANNA)
+    player.send({ type: 'takeback' })
+    expect(player.last('error').code).toBe('unsupported')
+  })
+
+  describe('часы', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(0)
+    })
+
+    it('не возвращаются; после отмены идут у игрока', () => {
+      const { anna, bot } = againstBot('w', ONE_MINUTE)
+      anna.move('e2', 'e4')
+      vi.advanceTimersByTime(2000)
+      bot.move('e7', 'e5')
+      anna.move('g1', 'f3')
+      vi.advanceTimersByTime(3000)
+
+      anna.send({ type: 'takeback' })
+      // Остатки остаются как были (в том числе инкремент за отменённый ход), а идут часы игрока
+      expect(anna.last('state').clock).toEqual({
+        config: ONE_MINUTE,
+        remaining: { w: 61_000, b: 56_000 },
+        running: 'w',
+      })
+    })
+
+    it('возврат в начальную позицию сбрасывает часы', () => {
+      const { anna } = againstBot('w', ONE_MINUTE)
+      anna.move('e2', 'e4')
+      vi.advanceTimersByTime(2000)
+      anna.send({ type: 'takeback' })
+      expect(anna.last('state')).toMatchObject({
+        moves: [],
+        clock: { remaining: { w: 60_000, b: 60_000 }, running: null },
+      })
+    })
   })
 })
 

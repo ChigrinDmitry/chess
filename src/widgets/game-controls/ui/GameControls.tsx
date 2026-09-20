@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Color } from '@/entities/game'
 import { FlipBoardButton } from '@/features/flip-board'
 import { DrawOfferDialog, OfferDrawButton } from '@/features/offer-draw'
+import { TakebackButton } from '@/features/request-takeback'
 import { ResignButton } from '@/features/resign-game'
 import { GlassButton, GlassModal } from '@/shared/ui'
 import styles from './GameControls.module.css'
@@ -20,6 +21,10 @@ export interface GameControlsProps {
   onOfferDraw: () => void
   onAnswerDraw: (accept: boolean) => void
   onNewGame: () => void
+  /** Отмена хода; передаётся только в партии с ботом, иначе кнопки нет. */
+  onTakeback?: (() => void) | undefined
+  /** Есть что отменять (по умолчанию — идёт партия и сыгран хотя бы один полуход). */
+  canTakeback?: boolean | undefined
 }
 
 /** Действия партии: переворот доски, сдача, ничья по соглашению, новая партия. */
@@ -33,6 +38,8 @@ export function GameControls({
   onOfferDraw,
   onAnswerDraw,
   onNewGame,
+  onTakeback,
+  canTakeback = plyCount > 0,
 }: GameControlsProps) {
   const [confirmingNew, setConfirmingNew] = useState(false)
 
@@ -51,6 +58,7 @@ export function GameControls({
     <div className={styles.controls}>
       {inProgress && (
         <>
+          {onTakeback && <TakebackButton disabled={!canTakeback} onTakeback={onTakeback} />}
           <OfferDrawButton onOffer={onOfferDraw} />
           <ResignButton color={actor} onResign={onResign} />
         </>

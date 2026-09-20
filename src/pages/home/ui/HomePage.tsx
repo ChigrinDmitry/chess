@@ -24,10 +24,12 @@ export function HomePage() {
               Играть
             </GlassLink>
           </GlassPanel>
-          <GlassPanel as="article" padding="lg" className={styles.card} data-soon>
+          <GlassPanel as="article" padding="lg" className={styles.card}>
             <h2 className={styles.cardTitle}>С ботом</h2>
             <p className={styles.cardText}>Уровни от новичка до сильного любителя.</p>
-            <span className={styles.soon}>Скоро</span>
+            <GlassLink to={ROUTES.bot} variant="primary" size="lg">
+              Играть
+            </GlassLink>
           </GlassPanel>
           <GlassPanel as="article" padding="lg" className={styles.card} data-soon>
             <h2 className={styles.cardTitle}>Онлайн по ссылке</h2>

@@ -23,7 +23,7 @@ const displayName = z
   .regex(/^[\p{L}\p{N} _.'-]+$/u)
 
 const identity = z.object({
-  kind: z.enum(['guest', 'user']),
+  kind: z.enum(['guest', 'user', 'bot']),
   id: z.string().min(1).max(64),
   displayName,
   avatar: z.object({
@@ -69,6 +69,7 @@ const errorCode = z.enum([
   'game-over',
   'game-not-over',
   'no-draw-offer',
+  'takeback-unavailable',
   'unsupported',
 ])
 

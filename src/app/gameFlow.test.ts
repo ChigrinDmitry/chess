@@ -193,6 +193,14 @@ describe('сдача, ничья, реванш', () => {
     expect(boris.store.getState().you).toEqual(['w'])
     expect(boris.move({ from: 'd2', to: 'd4' })).toBe(true)
   })
+
+  it('отмена хода против человека отклоняется, партия не меняется', () => {
+    const { anna } = table()
+    anna.move({ from: 'e2', to: 'e4' })
+    anna.takeback()
+    expect(anna.store.getState().error).toBe('unsupported')
+    expect(sans(anna)).toEqual(['e4'])
+  })
 })
 
 describe('часы', () => {

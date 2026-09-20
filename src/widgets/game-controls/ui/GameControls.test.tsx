@@ -34,6 +34,27 @@ describe('GameControls', () => {
     expect(screen.getByRole('button', { name: 'Новая партия' })).toBeInTheDocument()
   })
 
+  it('отмена хода — только когда её передали (партия с ботом)', async () => {
+    setup()
+    expect(screen.queryByRole('button', { name: 'Отменить ход' })).not.toBeInTheDocument()
+  })
+
+  it('«Отменить ход» отдаёт действие наружу, но недоступна без ходов и вне партии', async () => {
+    const onTakeback = vi.fn()
+    const { rerender, props } = setup({ onTakeback, plyCount: 2 })
+    await userEvent.click(screen.getByRole('button', { name: 'Отменить ход' }))
+    expect(onTakeback).toHaveBeenCalledOnce()
+
+    rerender(<GameControls {...props} onTakeback={onTakeback} plyCount={0} />)
+    expect(screen.getByRole('button', { name: 'Отменить ход' })).toBeDisabled()
+
+    rerender(<GameControls {...props} onTakeback={onTakeback} plyCount={5} canTakeback={false} />)
+    expect(screen.getByRole('button', { name: 'Отменить ход' })).toBeDisabled()
+
+    rerender(<GameControls {...props} onTakeback={onTakeback} plyCount={5} inProgress={false} />)
+    expect(screen.queryByRole('button', { name: 'Отменить ход' })).not.toBeInTheDocument()
+  })
+
   it('сдача от имени actor', async () => {
     const { props } = setup({ actor: 'b' })
     await userEvent.click(screen.getByRole('button', { name: 'Сдаться' }))

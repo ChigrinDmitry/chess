@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useStore } from 'zustand'
+import { TimeControlPicker } from '@/entities/clock'
 import {
   describeStatus,
   selectCheckedKingSquare,
@@ -16,7 +17,6 @@ import { GameResultModal } from '@/widgets/game-result-modal'
 import { GameSidebar } from '@/widgets/game-sidebar'
 import { LOCAL_PLAYERS } from '../model/createLocalGame'
 import { useLocalGame } from '../model/useLocalGame'
-import { TimeControlPicker } from './TimeControlPicker'
 import styles from './LocalGamePage.module.css'
 
 function pgnHeaders(): Record<string, string> {

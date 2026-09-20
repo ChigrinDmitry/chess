@@ -1,0 +1,35 @@
+.panel {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: center;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.group {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.caption {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.hint {
+  min-height: 1.5em;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
