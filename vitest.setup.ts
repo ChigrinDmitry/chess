@@ -7,7 +7,8 @@ afterEach(() => {
 })
 
 // jsdom не реализует showModal/close у <dialog> — минимальный полифил для тестов.
-if (!HTMLDialogElement.prototype.showModal) {
+// В серверных тестах (`@vitest-environment node`) DOM нет.
+if (typeof HTMLDialogElement !== 'undefined' && !HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
     this.setAttribute('open', '')
   }

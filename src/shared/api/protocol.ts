@@ -71,11 +71,21 @@ const errorCode = z.enum([
   'no-draw-offer',
   'takeback-unavailable',
   'unsupported',
+  /** Сервер: секрет места не совпал с тем, что привязан к этой личности в комнате. */
+  'unauthorized',
 ])
 
 export const clientMessageSchema = z.discriminatedUnion('type', [
-  /** Войти в комнату; повторный `join` — запрос текущего состояния (resync). */
-  z.object({ type: z.literal('join'), identity, color: color.optional() }),
+  /**
+   * Войти в комнату; повторный `join` — запрос текущего состояния (resync). `token` — секрет
+   * места для сервера: его подставляет `WebSocketTransport`, до хоста он не доходит.
+   */
+  z.object({
+    type: z.literal('join'),
+    identity,
+    color: color.optional(),
+    token: z.string().min(16).max(128).optional(),
+  }),
   z.object({ type: z.literal('move'), ...moveInput.shape }),
   z.object({ type: z.literal('resign') }),
   z.object({ type: z.literal('offerDraw') }),

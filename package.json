@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "node --watch-path=./server --watch-path=./src server/dev.ts",
     "build": "tsc -b && vite build",
+    "build:server": "vite build --config vite.server.config.ts",
+    "start:server": "node dist-server/main.js",
     "lint": "oxlint",
     "preview": "vite preview",
     "lint:fsd": "steiger ./src",
@@ -22,6 +25,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^8.4.0",
+    "ws": "^8.21.3",
     "zod": "^4.6.5",
     "zustand": "^5.0.15"
   },
@@ -33,6 +37,7 @@
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^5.0.1",
     "jsdom": "^29.1.1",
