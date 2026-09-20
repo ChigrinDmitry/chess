@@ -41,6 +41,23 @@ describe('protocol: сообщения клиента', () => {
     expect(parseClientMessage(input)).toBeNull()
   })
 
+  describe('токен в join', () => {
+    const join = (token: unknown) => ({ type: 'join', identity, token })
+
+    it('необязателен и принимается нормальной длины', () => {
+      expect(parseClientMessage({ type: 'join', identity })).not.toBeNull()
+      expect(parseClientMessage(join('a'.repeat(32)))).toMatchObject({ token: 'a'.repeat(32) })
+    })
+
+    it.each([
+      ['короткий', 'abc'],
+      ['слишком длинный', 'a'.repeat(129)],
+      ['не строка', 42],
+    ])('отклоняет: %s', (_name, token) => {
+      expect(parseClientMessage(join(token))).toBeNull()
+    })
+  })
+
   describe('ник в join', () => {
     const join = (displayName: string) => ({ type: 'join', identity: { ...identity, displayName } })
 
