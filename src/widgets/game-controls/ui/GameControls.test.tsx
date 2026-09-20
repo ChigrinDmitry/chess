@@ -7,9 +7,11 @@ function setup(patch: Partial<GameControlsProps> = {}) {
     actor: 'w',
     inProgress: true,
     plyCount: 0,
+    drawOfferedBy: null,
     onFlip: vi.fn(),
     onResign: vi.fn(),
-    onAgreeDraw: vi.fn(),
+    onOfferDraw: vi.fn(),
+    onAnswerDraw: vi.fn(),
     onNewGame: vi.fn(),
     ...patch,
   }
@@ -43,28 +45,35 @@ describe('GameControls', () => {
     expect(props.onResign).toHaveBeenCalledExactlyOnceWith('b')
   })
 
-  it('ничья: предложение → согласие соперника', async () => {
-    const { props } = setup({ actor: 'w', plyCount: 6 })
+  it('«Предложить ничью» отдаёт предложение наружу и сам диалог не открывает', async () => {
+    const { props } = setup()
     await userEvent.click(screen.getByRole('button', { name: 'Предложить ничью' }))
+    expect(props.onOfferDraw).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('на предложение соперника можно согласиться', async () => {
+    const { props } = setup({ drawOfferedBy: 'w' })
     expect(screen.getByRole('dialog', { name: 'Предложение ничьей' })).toHaveTextContent(
       'Белые предлагают ничью',
     )
     await userEvent.click(screen.getByRole('button', { name: 'Принять ничью' }))
-    expect(props.onAgreeDraw).toHaveBeenCalledOnce()
+    expect(props.onAnswerDraw).toHaveBeenCalledExactlyOnceWith(true)
   })
 
-  it('отказ от ничьей не заканчивает партию', async () => {
-    const { props } = setup({ plyCount: 6 })
-    await userEvent.click(screen.getByRole('button', { name: 'Предложить ничью' }))
+  it('отказ и закрытие окна — отказ; закрытие после ответа второго отказа не даёт', async () => {
+    const { props, rerender } = setup({ drawOfferedBy: 'b' })
     await userEvent.click(screen.getByRole('button', { name: 'Отклонить' }))
-    expect(props.onAgreeDraw).not.toHaveBeenCalled()
+    expect(props.onAnswerDraw).toHaveBeenCalledExactlyOnceWith(false)
+
+    // Хост снял предложение — окно закрылось само, это не новый отказ
+    rerender(<GameControls {...props} drawOfferedBy={null} />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(props.onAnswerDraw).toHaveBeenCalledOnce()
   })
 
-  it('ход снимает предложение ничьей', async () => {
-    const { props, rerender } = setup({ plyCount: 6 })
-    await userEvent.click(screen.getByRole('button', { name: 'Предложить ничью' }))
-    rerender(<GameControls {...props} plyCount={7} />)
+  it('после окончания партии предложение не показывается', () => {
+    setup({ inProgress: false, drawOfferedBy: 'w' })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 

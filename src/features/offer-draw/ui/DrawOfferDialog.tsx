@@ -14,14 +14,19 @@ const SIDE: Record<Color, { offerer: string; answerer: string }> = {
   b: { offerer: 'Чёрные', answerer: 'Белые' },
 }
 
-/** Ответ соперника на предложение ничьей. Закрытие окна (Esc, крестик) — отказ. */
+/**
+ * Ответ соперника на предложение ничьей. Закрытие окна (Esc, крестик) — отказ; а окно, которое
+ * закрылось само из-за ответа или хода, отказом не считается.
+ */
 export function DrawOfferDialog({ offeredBy, onAccept, onDecline }: DrawOfferDialogProps) {
   const side = SIDE[offeredBy ?? 'w']
 
   return (
     <GlassModal
       open={offeredBy !== null}
-      onClose={onDecline}
+      onClose={() => {
+        if (offeredBy !== null) onDecline()
+      }}
       title="Предложение ничьей"
       footer={
         <>
