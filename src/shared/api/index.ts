@@ -1,4 +1,5 @@
 export { createBroadcastClient, createBroadcastHost } from './BroadcastChannelTransport'
+export { createWebSocketClient, type WebSocketTransportOptions } from './WebSocketTransport'
 export { createLocalRoom, type LocalRoom } from './LocalTransport'
 export {
   DISPLAY_NAME_MAX,
