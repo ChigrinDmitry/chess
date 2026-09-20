@@ -1,6 +1,6 @@
 import type { Color } from '@/entities/game/@x/player'
 
-export type PlayerKind = 'guest' | 'user'
+export type PlayerKind = 'guest' | 'user' | 'bot'
 
 /** Внешность игрока: градиент из id + инициалы (генерирует `entities/session`, этап 8). */
 export interface PlayerAvatar {
@@ -9,7 +9,10 @@ export interface PlayerAvatar {
   initials: string
 }
 
-/** Идентичность игрока. `'user'` заложен в контракте, в MVP используется только `'guest'`. */
+/**
+ * Идентичность игрока. `'user'` заложен в контракте (в MVP людей представляет только `'guest'`),
+ * `'bot'` — соперник-движок: против него доступна отмена хода.
+ */
 export interface PlayerIdentity {
   kind: PlayerKind
   id: string

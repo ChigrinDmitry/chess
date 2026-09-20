@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Chess Online: a frontend-only web app (React 19 + TypeScript 6, Vite 8) for playing chess online or against a bot, in a "liquid glass" visual style. There is no backend. Project docs and code comments are written in Russian.
 
 - [docs/TZ.md](docs/TZ.md) — the spec (requirements, architecture decisions, routes, a11y/perf targets).
-- [docs/ROADMAP.md](docs/ROADMAP.md) — staged plan (0–10) and a **Статус** checklist at the bottom. Stages 0 (scaffold), 1 (design system + themes), 2 (game core: `entities/game`, `clock`, `player`), 3 (pieces + board: `entities/piece`, `widgets/chess-board`, `features/make-move|promote-pawn|flip-board`, `shared/lib/pointer-drag`), 4 (local game end to end: `/local` with clocks, move list/history, resign, draw offers, result modal; `widgets/game-sidebar|game-controls|game-result-modal|app-header`, `features/navigate-history|resign-game|offer-draw`, `pages/home`) and 5 (protocol, host, transports: `shared/api`, `features/host-game`, `features/game-client`; `/local` runs through host + client over `LocalTransport`) are done; online between tabs, bot and session are not yet implemented. Check the roadmap before assuming a module exists (`entities/session|bot`, other `features/` and `widgets/` are not created yet).
+- [docs/ROADMAP.md](docs/ROADMAP.md) — staged plan (0–10) and a **Статус** checklist at the bottom. Stages 0 (scaffold), 1 (design system + themes), 2 (game core: `entities/game`, `clock`, `player`), 3 (pieces + board: `entities/piece`, `widgets/chess-board`, `features/make-move|promote-pawn|flip-board`, `shared/lib/pointer-drag`), 4 (local game end to end: `/local` with clocks, move list/history, resign, draw offers, result modal; `widgets/game-sidebar|game-controls|game-result-modal|app-header`, `features/navigate-history|resign-game|offer-draw`, `pages/home`), 5 (protocol, host, transports: `shared/api`, `features/host-game`, `features/game-client`; `/local` runs through host + client over `LocalTransport`) and 7 (bot: `entities/bot`, `features/play-vs-bot|request-takeback`, `widgets/bot-settings-panel`, `pages/bot-game`; `/bot`) are done; online between tabs (stage 6) and session (stage 8) are not yet implemented. Check the roadmap before assuming a module exists (`entities/session`, other `features/` and `widgets/` are not created yet).
 
 ## Commands
 
@@ -31,11 +31,11 @@ CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs, in order: `forma
 
 **Feature-Sliced Design.** Layers under `src/`, importing only downward: `app` → `pages` → `widgets` → `features` → `entities` → `shared`. Each slice exposes a public API via `index.ts`; import from the slice root, not its internals. Use the `@/` alias for `src/`. `npm run lint:fsd` (Steiger) checks this; `fsd/insignificant-slice` is intentionally off in [steiger.config.ts](steiger.config.ts) while slices are still stubs.
 
-**Architecture from the spec** (game rules, transport and host exist; bot and session are not built yet) — keep new code consistent with it:
+**Architecture from the spec** (game rules, transport, host and bot exist; session is not built yet) — keep new code consistent with it:
 
 - Game rules are delegated to `chess.js`, wrapped behind an interface in `entities/game`; state via Zustand; styling via CSS Modules.
 - All play (including local hot-seat and bot) goes through `shared/api`: the client side `GameTransport` and the server side `HostTransport` (`LocalTransport` — synchronous in-memory room, `BroadcastChannelTransport`, later `WebSocketTransport`), with Zod-validated protocol messages (`shared/api/protocol.ts` is the single source of truth). Authoritative game logic lives in `features/host-game`, not in transports; UI talks to the host only through `features/game-client` (a replica of the game + clocks in stores). Pages compose them (see `pages/local-game/model/createLocalGame`).
-- The bot is an ordinary player speaking the same protocol; the engine (Stockfish in a Web Worker) sits behind a `ChessEngine` interface.
+- The bot is an ordinary player speaking the same protocol (`features/play-vs-bot`, identity `kind: 'bot'`); the engine (Stockfish in a Web Worker) sits behind a `ChessEngine` interface in `entities/bot`. `pages/bot-game/model/createBotGame` wires host + bot + human client in one in-memory room. The host allows `takeback` only when the opponent's seat is a `bot` identity.
 - Identity comes only from `entities/session` / `AuthService` (guest-only in MVP); nothing else reads `localStorage` for it.
 
 **Routing** ([src/app/router.tsx](src/app/router.tsx)): `createBrowserRouter`; paths live in `ROUTES` ([src/shared/config/routes.ts](src/shared/config/routes.ts)). Heavy pages are lazy-loaded via the `lazy` route option (e.g. `/kit`).
@@ -45,6 +45,10 @@ CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs, in order: `forma
 **Glass UI kit** (`src/shared/ui/Glass*`) is built on the shared `.surface` class in [glass.module.css](src/shared/ui/glass.module.css) (backdrop blur + fill + border + highlight). `/kit` ([src/pages/kit](src/pages/kit)) is a showcase page for iterating on glass in both themes. Fallbacks for `@supports`, `prefers-reduced-*` are in `fallbacks.css`.
 
 ## Gotchas
+
+- `public/engine/` holds the vendored Stockfish 19 lite-single build (**GPLv3**; the repo is GPL-3.0 too, see `LICENSE`). It is excluded from Prettier and oxlint. The worker finds its `.wasm` by swapping `.js` for `.wasm` in the script URL, so keep both files in one folder under one name. Node can't run the engine from inside the repo (`"type": "module"` breaks its CommonJS build) — copy it out to calibrate levels. Provenance, checksums and update steps: `public/engine/README.md`.
+- Bot levels use `Skill Level` + depth caps, **not** `UCI_Elo` (it plays weaker than the level below at 100–500 ms per move). Elo shown in the UI is an estimate, not a measured rating.
+- `LocalTransport` delivers synchronously, so anything that answers a broadcast from inside its handler re-enters the host: the bot delays its draw/rematch replies (`RESPONSE_DELAY_MS`) instead of sending them immediately.
 
 - `vite.config.ts` sets `build.cssTarget` to include `safari16` deliberately: without it the minifier strips `-webkit-backdrop-filter` and glass disappears in Safari < 18. Keep the `-webkit-` prefixes in CSS.
 - jsdom lacks `<dialog>.showModal/close`; [vitest.setup.ts](vitest.setup.ts) polyfills them. Vitest runs with `globals: true` and CSS modules use `non-scoped` class names, so tests can query by plain class name.

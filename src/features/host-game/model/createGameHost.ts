@@ -232,6 +232,35 @@ export function createGameHost(options: GameHostOptions): GameHost {
     }
   }
 
+  /**
+   * Отмена хода — только против бота. Возвращает игроку право хода: если ходит он сам, снимаются
+   * его последний ход и ответ соперника (2 полухода), если соперник ещё думает — только свой ход.
+   * Часы не возвращаются: время, потраченное на отменённые ходы, не прощается.
+   */
+  const takeback = (clientId: string) => {
+    if (hotSeat) return fail(clientId, 'unsupported')
+    const color = requireActive(clientId)
+    if (!color) return
+    if (seats[other(color)]?.kind !== 'bot') return fail(clientId, 'unsupported')
+
+    const { turn, moves } = game.getState()
+    const plies = turn === color ? 2 : 1
+    if (moves.length < plies) return fail(clientId, 'takeback-unavailable')
+
+    game.getState().undo(plies)
+    drawOffer = null
+    if (clock) {
+      if (game.getState().moves.length === 0) {
+        // Вернулись в начальную позицию: часы снова ждут первого хода
+        clock.getState().reset()
+      } else if (clock.getState().running !== color) {
+        clock.getState().stop()
+        clock.getState().start(color)
+      }
+    }
+    sendStateToAll()
+  }
+
   const rematch = (clientId: string) => {
     if (hotSeat) return resetGame(false)
     if (!game.getState().result) return fail(clientId, 'game-not-over')
@@ -269,8 +298,7 @@ export function createGameHost(options: GameHostOptions): GameHost {
       case 'rematch':
         return rematch(clientId)
       case 'takeback':
-        // Отмена хода — только против бота (этап 7)
-        return fail(clientId, 'unsupported')
+        return takeback(clientId)
     }
   }
 

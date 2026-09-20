@@ -9,6 +9,10 @@ export const router = createBrowserRouter([
     lazy: async () => ({ Component: (await import('@/pages/local-game')).LocalGamePage }),
   },
   {
+    path: ROUTES.bot,
+    lazy: async () => ({ Component: (await import('@/pages/bot-game')).BotGamePage }),
+  },
+  {
     path: ROUTES.kit,
     lazy: async () => ({ Component: (await import('@/pages/kit')).KitPage }),
   },

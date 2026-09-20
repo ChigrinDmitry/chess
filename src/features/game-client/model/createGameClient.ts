@@ -58,6 +58,8 @@ export interface GameClient {
   offerDraw(): void
   answerDraw(accept: boolean): void
   rematch(): void
+  /** Отменить свой последний ход (и ответ на него); хост разрешает только против бота. */
+  takeback(): void
   /** Запросить у хоста полное состояние. */
   resync(): void
 }
@@ -229,6 +231,7 @@ export function createGameClient(options: GameClientOptions): GameClient {
     offerDraw: () => send({ type: 'offerDraw' }),
     answerDraw: (accept) => send({ type: 'answerDraw', accept }),
     rematch: () => send({ type: 'rematch' }),
+    takeback: () => send({ type: 'takeback' }),
     resync,
   }
 }

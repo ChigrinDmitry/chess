@@ -1,4 +1,4 @@
-import { TIME_CONTROLS, type TimeControlId } from '@/entities/clock'
+import { TIME_CONTROLS, type TimeControlId } from '../model/timeControls'
 import { GlassSegmentedControl, type SegmentedOption } from '@/shared/ui'
 import styles from './TimeControlPicker.module.css'
 
